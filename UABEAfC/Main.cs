@@ -572,15 +572,34 @@ namespace UABEAfC {
             Console.WriteLine("");
             int max = bundleInst.file.NumFiles;
             string num = "0";
+            int nbAssets = 0;
             if (max > 1) {
                 for (int i = 0; i < max; i++) {
-                    Console.WriteLine("[" + i + "]   " + bundleInst.file.bundleInf6.dirInf[i].name);
+                    //warning: does not update if you import an assets file onto
+                    //a file that wasn't originally an assets file
+                    var fileInf = BundleHelper.GetDirInfo(bundleInst.file, i);
+                    bool isAssetsFile = bundleInst.file.IsAssetsFile(bundleInst.file.reader, fileInf);
+                    if (isAssetsFile)
+                    {
+                        Console.WriteLine("[" + i + "]   " + bundleInst.file.bundleInf6.dirInf[i].name + " (asset file).");
+                        nbAssets++;
+                        num = i.ToString();
+                    }
+                    else
+                    {
+                        Console.WriteLine("[" + i + "]   " + bundleInst.file.bundleInf6.dirInf[i].name + " (discarded not an asset file).");
+                    }
                 }
                 Console.WriteLine("");
-                Console.Write("Which file? [0-" + (max - 1) + "] >");
 
-                num = Console.ReadLine();
+                if (nbAssets != 1)
+                {
+                    Console.Write("Which file? [0-" + (max - 1) + "] >");
+                    num = Console.ReadLine();
+                }
+
             } else {
+                nbAssets = 1;
                 num = "0";
             }
             int index = 0;
